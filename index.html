@@ -110,11 +110,11 @@
         </form>
     </div>
 
-    <!-- Firebase SDK (Firestore only, no Analytics needed) -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+    <!-- Firebase SDK (CDN version) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
-    <script>
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBo0kk3GuLNpkomN8B_4hAdrCEETl3R7QM",
@@ -126,8 +126,8 @@
         };
 
         // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         // Form Submission
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
@@ -143,13 +143,13 @@
                 interests: formData.getAll('interests'),
                 message: formData.get('message'),
                 form_type: formData.get('form_type'), // Identify which collection to store in
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                timestamp: serverTimestamp()
             };
 
             try {
                 // Store data in Firestore under the form_type collection
                 const collectionName = data.form_type; // Use form_type as the collection name
-                await db.collection(collectionName).add(data);
+                const docRef = await addDoc(collection(db, collectionName), data);
 
                 alert("Form submitted successfully!");
                 window.location.href = "/Thankyou.html"; // Redirect after submission
