@@ -150,11 +150,10 @@
                 // Store data in Firestore under the form_type collection
                 const collectionName = data.form_type; // Use form_type as the collection name
                 const docRef = await addDoc(collection(db, collectionName), data);
-
-                window.location.href = "Discovery/Thankyou.html"; // Redirect after submission
+                window.location.href = "https://nsbeeslee.github.io/Discovery/Thankyou.html"; // Redirect after submission
             } catch (error) {
                 console.error("Error submitting form: ", error);
-                window.location.href = "Discovery/Error.html"; // Redirect to error page
+                window.location.href = "https://nsbeeslee.github.io/Discovery/Error.html"; // Redirect to error page
             }
         });
     </script>
