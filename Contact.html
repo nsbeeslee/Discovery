@@ -63,40 +63,89 @@
         .form-container button:hover {
             background-color: #c02020;
         }
+        #interests {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+        #interests label {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+            margin-bottom: 10px;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="form-container">
         <img src="Verge Nursing.png" alt="Verge Nursing Logo"> <!-- Replace with your logo URL -->
         <h2>Let's Connect</h2>
-        <form id="contactForm" action="https://script.google.com/macros/s/AKfycbw2jKeoCfjuMIccMKVkDFQ9jr0TrLZi2o6w58DzeS2pMCKrEkDUeclzratwkDwobWta/exec" method="post" onsubmit="return validateEmail(event)">
+        <form id="contactForm">
             <input type="text" name="first_name" placeholder="First Name" required>
             <input type="text" name="last_name" placeholder="Last Name" required>
             <input type="email" id="email" name="email" placeholder="Email" required>
             <input type="tel" name="phone" placeholder="Phone (e.g., 555-555-5555)" required>
             <input type="text" name="company" placeholder="Company Name" required>
+            <label for="interests" style="color: #fff; margin-bottom: 10px;">I'm interested in (check all that apply):</label>
             <textarea name="message" placeholder="Comments, Questions or Details of Your Request" required></textarea>
+            
+            <!-- Hidden input field to distinguish between collections -->
+            <input type="hidden" name="form_type" value="Contact Form">
+            
             <button type="submit">Submit</button>
         </form>
     </div>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js"></script>
+
     <script>
-        function validateEmail(event) {
-            const email = document.getElementById('email').value;
-            const freeEmailDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
-            
-            // Extract domain from email
-            const emailDomain = email.split('@')[1];
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBo0kk3GuLNpkomN8B_4hAdrCEETl3R7QM",
+            authDomain: "verge-contact-form.firebaseapp.com",
+            projectId: "verge-contact-form",
+            storageBucket: "verge-contact-form.firebasestorage.app",
+            messagingSenderId: "1006002945326",
+            appId: "1:1006002945326:web:25b6ff27126bbccfae4ebf",
+        };
 
-            // Check if email domain is in the freeEmailDomains list
-            if (freeEmailDomains.includes(emailDomain)) {
-                alert("Free email services (e.g., Gmail, Yahoo, Hotmail) are not allowed. Please use a company email address.");
-                event.preventDefault(); // Prevent form submission
-                return false; // Make sure the form does not get submitted
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Form Submission
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const data = {
+                first_name: formData.get('first_name'),
+                last_name: formData.get('last_name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                company: formData.get('company'),
+                message: formData.get('message'),
+                form_type: formData.get('form_type'), // Identify which collection to store in
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                // Store data in different collections based on the form_type
+                const collectionName = data.form_type; // e.g., form_submissions1 or form_submissions2
+                await db.collection(collectionName).add(data);
+                alert("Form submitted successfully!");
+                window.location.href = "/Thankyou2.html";
+            } catch (error) {
+                console.error("Error submitting form: ", error);
+                alert("An error occurred while submitting your form.");
+                window.location.href = "/Error2.html";
             }
-
-            return true; // Allow form submission if domain is not from a free email provider
-        }
+        });
     </script>
 </body>
 </html>
