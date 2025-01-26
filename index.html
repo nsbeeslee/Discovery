@@ -129,9 +129,24 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Function to validate email domain
+        function isValidEmail(email) {
+            const freeEmailDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
+            const emailDomain = email.split('@')[1]; // Extract domain from email
+            return !freeEmailDomains.includes(emailDomain); // Return false if domain is in the list
+        }
+
         // Form Submission
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault(); // Prevent default form submission
+
+            const email = document.getElementById('email').value;
+
+            // Check if email is from a free email provider
+            if (!isValidEmail(email)) {
+                alert("Please use a company email address (no free email services such as Gmail, Yahoo, etc.).");
+                return; // Stop submission if email is invalid
+            }
 
             const formData = new FormData(e.target);
             const data = {
