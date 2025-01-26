@@ -110,9 +110,9 @@
         </form>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js"></script>
+    <!-- Firebase SDK (Firestore only, no Analytics needed) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
 
     <script>
         // Firebase Configuration
@@ -133,8 +133,6 @@
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault(); // Prevent default form submission
 
-            console.log('Form submission started'); // Debugging line to see if submission is triggered
-
             const formData = new FormData(e.target);
             const data = {
                 first_name: formData.get('first_name'),
@@ -148,23 +146,19 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
 
-            console.log('Form data:', data); // Log form data to the console to verify it
-
             try {
-                // Store data in Firestore
-                const collectionName = data.form_type; // e.g., form_submissions1 or form_submissions2
+                // Store data in Firestore under the form_type collection
+                const collectionName = data.form_type; // Use form_type as the collection name
                 await db.collection(collectionName).add(data);
-                console.log('Form submitted to Firestore'); // Debugging line to verify submission to Firestore
 
                 alert("Form submitted successfully!");
                 window.location.href = "/Thankyou.html"; // Redirect after submission
             } catch (error) {
                 console.error("Error submitting form: ", error);
                 alert("An error occurred while submitting your form.");
-                window.location.href = "/Error.html"; // Redirect to error page in case of failure
+                window.location.href = "/Error.html"; // Redirect to error page
             }
         });
     </script>
 </body>
 </html>
-
