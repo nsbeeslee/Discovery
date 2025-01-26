@@ -144,8 +144,8 @@
 
             // Check if email is from a free email provider
             if (!isValidEmail(email)) {
-                alert("Please use a company email address (no free email services such as Gmail, Yahoo, etc.).");
-                return; // Stop submission if email is invalid
+                console.error("Error submitting form: ", error);
+                window.location.href = "https://nsbeeslee.github.io/Discovery/Error.html"; // Redirect to error page
             }
 
             const formData = new FormData(e.target);
