@@ -102,6 +102,10 @@
                 </label>
             </div>
             <textarea name="message" placeholder="Comments, Questions or Details of Your Request" required></textarea>
+            
+            <!-- Hidden input field to distinguish between collections -->
+            <input type="hidden" name="form_type" value="Discovery Form">
+            
             <button type="submit">Submit</button>
         </form>
     </div>
@@ -119,7 +123,6 @@
             storageBucket: "verge-contact-form.firebasestorage.app",
             messagingSenderId: "1006002945326",
             appId: "1:1006002945326:web:25b6ff27126bbccfae4ebf",
-            measurementId: "G-Q5E5KYP0NM"
         };
 
         // Initialize Firebase
@@ -139,12 +142,14 @@
                 company: formData.get('company'),
                 interests: formData.getAll('interests'),
                 message: formData.get('message'),
+                form_type: formData.get('form_type'), // Identify which collection to store in
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
 
             try {
-                // Add data to Firestore
-                await db.collection("form_submissions").add(data);
+                // Store data in different collections based on the form_type
+                const collectionName = data.form_type; // e.g., form_submissions1 or form_submissions2
+                await db.collection(collectionName).add(data);
                 alert("Form submitted successfully!");
                 window.location.href = "/Thankyou.html";
             } catch (error) {
