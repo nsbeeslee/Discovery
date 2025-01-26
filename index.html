@@ -151,11 +151,11 @@
                 const collectionName = data.form_type; // e.g., form_submissions1 or form_submissions2
                 await db.collection(collectionName).add(data);
                 alert("Form submitted successfully!");
-                window.location.href = "/Thankyou.html";
+                window.location.href = "https://nsbeeslee.github.io/Discovery/Thankyou.html";
             } catch (error) {
                 console.error("Error submitting form: ", error);
                 alert("An error occurred while submitting your form.");
-                window.location.href = "/Error.html";
+                window.location.href = "https://nsbeeslee.github.io/Discovery/Error.html";
             }
         });
     </script>
