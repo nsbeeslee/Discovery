@@ -211,6 +211,13 @@
                 await addDoc(collection(db, 'VST Savings'), formData);
                 submitBtn.textContent = 'Thank You, your information has been submitted!';
                 submitBtn.style.backgroundColor = '#00ff00';
+                const resetButton = document.createElement("button");
+                resetButton.textContent = "Reset Form";
+                resetButton.style.marginTop = "10px";
+                resetButton.onclick = () => location.reload();
+
+                document.getElementById('roiForm').appendChild(resetButton);
+            
             } catch (error) {
                 submitBtn.textContent = 'Error. Try Again';
                 submitBtn.style.backgroundColor = '#ff4d4d';
