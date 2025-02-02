@@ -157,6 +157,9 @@
 
             if (!isValidEmail(email)) {
                 emailError.style.display = "block"; // Show error message
+                submitButton.textContent = "Submit";
+                submitButton.disabled = false;
+                return;
             } else {
                 emailError.style.display = "none"; // Hide it when valid
             }
