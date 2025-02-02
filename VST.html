@@ -13,79 +13,113 @@
             padding: 20px;
         }
         form {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             background: #002b7f;
             border-radius: 10px;
         }
         input, textarea, button {
-            width: 100%;
-            margin: 10px 0;
+            margin: 10px;
             padding: 10px;
             border-radius: 5px;
             border: none;
+        }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea {
+            width: calc(50% - 40px);
+            display: inline-block;
         }
         button {
             background-color: #ff4500;
             color: white;
             cursor: pointer;
+            width: calc(50% - 20px);
+        }
+        h1, h2, h3 {
+            color: #ffdd00;
         }
         .hidden {
+            display: none;
+        }
+        .section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ffdd00;
+        }
+        .savings {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #00ff00;
+        }
+        #error-message {
+            color: #ff4d4d;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 5px;
             display: none;
         }
     </style>
 </head>
 <body>
     <h1>Virtual Sitting ROI Calculator</h1>
+
     <form id="roiForm">
-        <label for="adc">Average Daily Census (ADC):</label>
-        <input type="number" id="adc" name="adc" step="1" placeholder="Enter ADC" required>
+        <div class="section">
+            <h2>Calculate Virtual Sitting ROI</h2>
+            <label for="adc">Average Daily Census (ADC):</label>
+            <input type="number" id="adc" name="adc" step="1" placeholder="Enter ADC" required>
 
-        <div id="additionalFields" class="hidden">
-            <label for="avgHourlyRate">Avg Sitter Hourly Rate:</label>
-            <input type="number" id="avgHourlyRate" name="avgHourlyRate" step="0.01" value="16.50">
+            <div id="additionalFields" class="hidden">
+                <label for="avgHourlyRate">Avg Sitter Hourly Rate:</label>
+                <input type="number" id="avgHourlyRate" name="avgHourlyRate" step="0.01" value="16.50">
 
-            <label for="avgFalls">Avg Falls / 1000 Patient Days:</label>
-            <input type="number" id="avgFalls" name="avgFalls" step="0.1" value="3.2">
+                <label for="avgFalls">Avg Falls / 1000 Patient Days:</label>
+                <input type="number" id="avgFalls" name="avgFalls" step="0.1" value="3.2">
 
-            <label for="fallInjuryRate">Avg Falls with Injury / 1000 Patient Days:</label>
-            <input type="number" id="fallInjuryRate" name="fallInjuryRate" step="0.1" value="0.5">
+                <label for="fallInjuryRate">Avg Falls with Injury / 1000 Patient Days:</label>
+                <input type="number" id="fallInjuryRate" name="fallInjuryRate" step="0.1" value="0.5">
 
-            <label for="patientsPerDay">Avg Patients / Day Requiring Sitters:</label>
-            <input type="number" id="patientsPerDay" name="patientsPerDay" step="1" value="10">
+                <label for="patientsPerDay">Avg Patients / Day Requiring Sitters:</label>
+                <input type="number" id="patientsPerDay" name="patientsPerDay" step="1" value="10">
 
-            <label for="patientsPerSitter">Patients Per Virtual Sitter (1-16):</label>
-            <input type="number" id="patientsPerSitter" name="patientsPerSitter" step="1" value="10">
+                <label for="patientsPerSitter">Patients Per Virtual Sitter (1-16):</label>
+                <input type="number" id="patientsPerSitter" name="patientsPerSitter" step="1" value="10">
+            </div>
         </div>
 
-        <div id="calculatedFields" class="hidden">
+        <div id="calculatedFields" class="hidden section">
             <h3>Estimated Savings</h3>
             <label for="basicSavings">Estimated Basic Savings:</label>
-            <input type="text" id="basicSavings" name="basicSavings" readonly>
+            <input type="text" id="basicSavings" name="basicSavings" class="savings" readonly>
 
             <label for="fallReductionSavings">Additional Fall Reduction Savings:</label>
-            <input type="text" id="fallReductionSavings" name="fallReductionSavings" readonly>
+            <input type="text" id="fallReductionSavings" name="fallReductionSavings" class="savings" readonly>
         </div>
 
-        <label for="comments">Comments, questions, or details:</label>
-        <textarea id="comments" name="comments" rows="3"></textarea>
+        <div class="section">
+            <h2>Discuss ROI Further?</h2>
+            <p>Let Verge Nursing discuss the ROI calculations in detail with you! Below fields are optional. Estimated ROI savings will display above after submission.</p>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" placeholder="example@example.com">
+            <label for="comments">Comments, questions, or details:</label>
+            <textarea id="comments" name="comments" rows="3"></textarea>
 
-        <label for="phone">Phone:</label>
-        <input type="tel" id="phone" name="phone" placeholder="(123) 456-7890">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="example@example.com">
+            <span id="error-message">⚠️ Please enter a business email.</span>
 
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" placeholder="First Last">
+            <label for="phone">Phone:</label>
+            <input type="tel" id="phone" name="phone" placeholder="(123) 456-7890">
 
-        <label for="company">Company:</label>
-        <input type="text" id="company" name="company">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" placeholder="First Last">
 
-        <input type="hidden" id="hiddenField" name="hiddenField" value="VST Savings">
+            <label for="company">Company:</label>
+            <input type="text" id="company" name="company">
 
-        <button type="button" id="submitBtn">Submit</button>
+            <input type="hidden" id="hiddenField" name="hiddenField" value="VST Savings">
+
+            <button type="button" id="submitBtn">Submit</button>
+        </div>
     </form>
 
     <script type="module">
@@ -93,12 +127,12 @@
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyBo0kk3GuLNpkomN8B_4hAdrCEETl3R7QM",
-            authDomain: "verge-contact-form.firebaseapp.com",
-            projectId: "verge-contact-form",
-            storageBucket: "verge-contact-form.firebasestorage.app",
-            messagingSenderId: "1006002945326",
-            appId: "1:1006002945326:web:25b6ff27126bbccfae4ebf",
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -108,6 +142,15 @@
         const additionalFields = document.getElementById('additionalFields');
         const calculatedFields = document.getElementById('calculatedFields');
         const submitBtn = document.getElementById('submitBtn');
+        const emailField = document.getElementById('email');
+        const emailError = document.getElementById('error-message');
+
+        const freeEmailDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
+
+        function isValidEmail(email) {
+            const emailDomain = email.split('@')[1];
+            return !freeEmailDomains.includes(emailDomain);
+        }
 
         adcInput.addEventListener('input', () => {
             if (adcInput.value) {
@@ -118,6 +161,20 @@
         });
 
         submitBtn.addEventListener('click', async () => {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            const email = emailField.value;
+
+            if (!isValidEmail(email)) {
+                emailError.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit';
+                return;
+            } else {
+                emailError.style.display = 'none';
+            }
+
             const adc = parseFloat(adcInput.value);
             const avgHourlyRate = parseFloat(document.getElementById('avgHourlyRate').value);
             const avgFalls = parseFloat(document.getElementById('avgFalls').value);
@@ -128,8 +185,8 @@
             const basicSavings = (8760 * patientsPerDay * avgHourlyRate) - (Math.ceil(patientsPerDay / patientsPerSitter) * avgHourlyRate * 8760);
             const fallReductionSavings = (((avgFalls * adc) / 1000) * 365 * 14000);
 
-            document.getElementById('basicSavings').value = basicSavings.toFixed(2);
-            document.getElementById('fallReductionSavings').value = fallReductionSavings.toFixed(2);
+            document.getElementById('basicSavings').value = `$${basicSavings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('fallReductionSavings').value = `$${fallReductionSavings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             calculatedFields.classList.remove('hidden');
 
             const formData = {
@@ -142,7 +199,7 @@
                 basicSavings,
                 fallReductionSavings,
                 comments: document.getElementById('comments').value,
-                email: document.getElementById('email').value,
+                email,
                 phone: document.getElementById('phone').value,
                 name: document.getElementById('name').value,
                 company: document.getElementById('company').value,
@@ -152,11 +209,20 @@
 
             try {
                 await addDoc(collection(db, 'VST Savings'), formData);
-                alert('Data submitted successfully!');
+                submitBtn.textContent = 'Thank You, your information has been submitted!';
+                submitBtn.style.backgroundColor = '#00ff00';
             } catch (error) {
-                alert('Error submitting data: ' + error.message);
+                submitBtn.textContent = 'Error. Try Again';
+                submitBtn.style.backgroundColor = '#ff4d4d';
+            } finally {
+                setTimeout(() => {
+                    submitBtn.textContent = 'Submit';
+                    submitBtn.style.backgroundColor = '#ff4500';
+                    submitBtn.disabled = false;
+                }, 3000);
             }
         });
     </script>
 </body>
 </html>
+
