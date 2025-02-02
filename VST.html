@@ -125,8 +125,8 @@
             const patientsPerDay = parseFloat(document.getElementById('patientsPerDay').value);
             const patientsPerSitter = parseFloat(document.getElementById('patientsPerSitter').value);
 
-            const basicSavings = adc * avgHourlyRate * patientsPerSitter;
-            const fallReductionSavings = avgFalls * fallInjuryRate * patientsPerDay;
+            const basicSavings = (8760 * patientsPerDay * avgHourlyRate) - (Math.ceil(patientsPerDay / patientsPerSitter) * avgHourlyRate * 8760);
+            const fallReductionSavings = (((avgFalls * adc) / 1000) * 365 * 14000);
 
             document.getElementById('basicSavings').value = basicSavings.toFixed(2);
             document.getElementById('fallReductionSavings').value = fallReductionSavings.toFixed(2);
