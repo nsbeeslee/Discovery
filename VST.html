@@ -12,6 +12,7 @@
             text-align: center;
             padding: 20px;
         }
+
         form {
             max-width: 800px;
             margin: 0 auto;
@@ -19,38 +20,57 @@
             background: #002b7f;
             border-radius: 10px;
         }
+
         input, textarea, button {
             margin: 10px;
             padding: 10px;
             border-radius: 5px;
             border: none;
         }
-        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea {
-            width: calc(50% - 40px);
+
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            width: 45%;
+            text-align: left;
+        }
+
+        .input-group input, .input-group textarea {
+            width: 45%;
             display: inline-block;
         }
+
         button {
             background-color: #ff4500;
             color: white;
             cursor: pointer;
-            width: calc(50% - 20px);
+            width: 100%;
         }
+
         h1, h2, h3 {
             color: #ffdd00;
         }
+
         .hidden {
             display: none;
         }
+
         .section {
             margin-top: 30px;
             padding-top: 20px;
             border-top: 2px solid #ffdd00;
         }
+
         .savings {
             font-weight: bold;
             font-size: 1.2em;
             color: #00ff00;
         }
+
         #error-message {
             color: #ff4d4d;
             font-size: 14px;
@@ -66,24 +86,36 @@
     <form id="roiForm">
         <div class="section">
             <h2>Calculate Virtual Sitting ROI</h2>
-            <label for="adc">Average Daily Census (ADC):</label>
-            <input type="number" id="adc" name="adc" step="1" placeholder="Enter ADC" required>
-
+            <div class="input-group">
+                <label for="adc">Average Daily Census (ADC):</label>
+                <input type="number" id="adc" name="adc" step="1" placeholder="Enter ADC" required>
+            </div>
+            
             <div id="additionalFields" class="hidden">
-                <label for="avgHourlyRate">Avg Sitter Hourly Rate:</label>
-                <input type="number" id="avgHourlyRate" name="avgHourlyRate" step="0.01" value="16.50">
+                <div class="input-group">
+                    <label for="avgHourlyRate">Avg Sitter Hourly Rate:</label>
+                    <input type="number" id="avgHourlyRate" name="avgHourlyRate" step="0.01" value="16.50">
+                </div>
 
-                <label for="avgFalls">Avg Falls / 1000 Patient Days:</label>
-                <input type="number" id="avgFalls" name="avgFalls" step="0.1" value="3.2">
+                <div class="input-group">
+                    <label for="avgFalls">Avg Falls / 1000 Patient Days:</label>
+                    <input type="number" id="avgFalls" name="avgFalls" step="0.1" value="3.2">
+                </div>
 
-                <label for="fallInjuryRate">Avg Falls with Injury / 1000 Patient Days:</label>
-                <input type="number" id="fallInjuryRate" name="fallInjuryRate" step="0.1" value="0.5">
+                <div class="input-group">
+                    <label for="fallInjuryRate">Avg Falls with Injury / 1000 Patient Days:</label>
+                    <input type="number" id="fallInjuryRate" name="fallInjuryRate" step="0.1" value="0.5">
+                </div>
 
-                <label for="patientsPerDay">Avg Patients / Day Requiring Sitters:</label>
-                <input type="number" id="patientsPerDay" name="patientsPerDay" step="1" value="10">
+                <div class="input-group">
+                    <label for="patientsPerDay">Avg Patients / Day Requiring Sitters:</label>
+                    <input type="number" id="patientsPerDay" name="patientsPerDay" step="1" value="10">
+                </div>
 
-                <label for="patientsPerSitter">Patients Per Virtual Sitter (1-16):</label>
-                <input type="number" id="patientsPerSitter" name="patientsPerSitter" step="1" value="10">
+                <div class="input-group">
+                    <label for="patientsPerSitter">Patients Per Virtual Sitter (1-16):</label>
+                    <input type="number" id="patientsPerSitter" name="patientsPerSitter" step="1" value="10">
+                </div>
             </div>
         </div>
 
@@ -91,34 +123,48 @@
             <h2>Discuss ROI Further?</h2>
             <p>Let Verge Nursing discuss the ROI calculations in detail with you! Below fields are optional. Estimated ROI savings will display above after submission.</p>
 
-            <label for="comments">Comments, questions, or details:</label>
-            <textarea id="comments" name="comments" rows="3"></textarea>
+            <div class="input-group">
+                <label for="comments">Comments, questions, or details:</label>
+                <textarea id="comments" name="comments" rows="3"></textarea>
+            </div>
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" placeholder="example@example.com">
-            <span id="error-message">⚠️ Please enter a business email.</span>
+            <div class="input-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="example@example.com">
+                <span id="error-message">⚠️ Please enter a business email.</span>
+            </div>
+                
+            <div class="input-group">
+                <label for="phone">Phone:</label>
+                <input type="tel" id="phone" name="phone" placeholder="(123) 456-7890">
+            </div>
 
-            <label for="phone">Phone:</label>
-            <input type="tel" id="phone" name="phone" placeholder="(123) 456-7890">
+            <div class="input-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" placeholder="First Last">
+            </div>
 
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" placeholder="First Last">
-
-            <label for="company">Company:</label>
-            <input type="text" id="company" name="company">
+            <div class="input-group">
+                <label for="company">Company:</label>
+                <input type="text" id="company" name="company">
+            </div>
 
             <input type="hidden" id="hiddenField" name="hiddenField" value="VST Savings">
-
+            
             <button type="button" id="submitBtn">Submit</button>
         </div>
         
         <div id="calculatedFields" class="hidden section">
             <h3>Estimated Savings</h3>
-            <label for="basicSavings">Estimated Basic Savings:</label>
-            <input type="text" id="basicSavings" name="basicSavings" class="savings" readonly>
+            <div class="input-group">
+                <label for="basicSavings">Estimated Basic Savings:</label>
+                <input type="text" id="basicSavings" name="basicSavings" class="savings" readonly>
+            </div>
 
-            <label for="fallReductionSavings">Additional Fall Reduction Savings:</label>
-            <input type="text" id="fallReductionSavings" name="fallReductionSavings" class="savings" readonly>
+            <div class="input-group">
+                <label for="fallReductionSavings">Additional Fall Reduction Savings:</label>
+                <input type="text" id="fallReductionSavings" name="fallReductionSavings" class="savings" readonly>
+            </div>
         </div>
     </form>
 
