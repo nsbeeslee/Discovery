@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Sitting ROI Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #001a57;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #002b7f;
+            border-radius: 10px;
+        }
+        input, textarea, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background-color: #ff4500;
+            color: white;
+            cursor: pointer;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Virtual Sitting ROI Calculator</h1>
+    <form id="roiForm">
+        <label for="adc">Average Daily Census (ADC):</label>
+        <input type="number" id="adc" name="adc" step="1" placeholder="Enter ADC" required>
+
+        <div id="additionalFields" class="hidden">
+            <label for="avgHourlyRate">Avg Sitter Hourly Rate:</label>
+            <input type="number" id="avgHourlyRate" name="avgHourlyRate" step="0.01" value="16.50">
+
+            <label for="avgFalls">Avg Falls / 1000 Patient Days:</label>
+            <input type="number" id="avgFalls" name="avgFalls" step="0.1" value="3.2">
+
+            <label for="fallInjuryRate">Avg Falls with Injury / 1000 Patient Days:</label>
+            <input type="number" id="fallInjuryRate" name="fallInjuryRate" step="0.1" value="0.5">
+
+            <label for="patientsPerDay">Avg Patients / Day Requiring Sitters:</label>
+            <input type="number" id="patientsPerDay" name="patientsPerDay" step="1" value="10">
+
+            <label for="patientsPerSitter">Patients Per Virtual Sitter (1-16):</label>
+            <input type="number" id="patientsPerSitter" name="patientsPerSitter" step="1" value="10">
+        </div>
+
+        <div id="calculatedFields" class="hidden">
+            <h3>Estimated Savings</h3>
+            <label for="basicSavings">Estimated Basic Savings:</label>
+            <input type="text" id="basicSavings" name="basicSavings" readonly>
+
+            <label for="fallReductionSavings">Additional Fall Reduction Savings:</label>
+            <input type="text" id="fallReductionSavings" name="fallReductionSavings" readonly>
+        </div>
+
+        <label for="comments">Comments, questions, or details:</label>
+        <textarea id="comments" name="comments" rows="3"></textarea>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" placeholder="example@example.com">
+
+        <label for="phone">Phone:</label>
+        <input type="tel" id="phone" name="phone" placeholder="(123) 456-7890">
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" placeholder="First Last">
+
+        <label for="company">Company:</label>
+        <input type="text" id="company" name="company">
+
+        <input type="hidden" id="hiddenField" name="hiddenField" value="VST Savings">
+
+        <button type="button" id="submitBtn">Submit</button>
+    </form>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const adcInput = document.getElementById('adc');
+        const additionalFields = document.getElementById('additionalFields');
+        const calculatedFields = document.getElementById('calculatedFields');
+        const submitBtn = document.getElementById('submitBtn');
+
+        adcInput.addEventListener('input', () => {
+            if (adcInput.value) {
+                additionalFields.classList.remove('hidden');
+            } else {
+                additionalFields.classList.add('hidden');
+            }
+        });
+
+        submitBtn.addEventListener('click', async () => {
+            const adc = parseFloat(adcInput.value);
+            const avgHourlyRate = parseFloat(document.getElementById('avgHourlyRate').value);
+            const avgFalls = parseFloat(document.getElementById('avgFalls').value);
+            const fallInjuryRate = parseFloat(document.getElementById('fallInjuryRate').value);
+            const patientsPerDay = parseFloat(document.getElementById('patientsPerDay').value);
+            const patientsPerSitter = parseFloat(document.getElementById('patientsPerSitter').value);
+
+            const basicSavings = adc * avgHourlyRate * patientsPerSitter;
+            const fallReductionSavings = avgFalls * fallInjuryRate * patientsPerDay;
+
+            document.getElementById('basicSavings').value = basicSavings.toFixed(2);
+            document.getElementById('fallReductionSavings').value = fallReductionSavings.toFixed(2);
+            calculatedFields.classList.remove('hidden');
+
+            const formData = {
+                adc,
+                avgHourlyRate,
+                avgFalls,
+                fallInjuryRate,
+                patientsPerDay,
+                patientsPerSitter,
+                basicSavings,
+                fallReductionSavings,
+                comments: document.getElementById('comments').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                name: document.getElementById('name').value,
+                company: document.getElementById('company').value,
+                hiddenField: document.getElementById('hiddenField').value,
+                timestamp: serverTimestamp()
+            };
+
+            try {
+                await addDoc(collection(db, 'VST Savings'), formData);
+                alert('Data submitted successfully!');
+            } catch (error) {
+                alert('Error submitting data: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
