@@ -139,16 +139,22 @@
             e.preventDefault(); 
 
             const submitButton = document.getElementById("submitButton");
+            const emailField = document.getElementById('email');
+            const emailError = document.getElementById('emailError');
+    
             submitButton.textContent = "Submitting...";
             submitButton.disabled = true;
 
-            const email = document.getElementById('email').value;
+            const email = emailField.value;
 
             if (!isValidEmail(email)) {
-                alert("Please enter a business email address.");
+                emailError.textContent = "Please enter a business email address.";
+                emailError.style.display = "block";  // Show error message
                 submitButton.textContent = "Submit";
                 submitButton.disabled = false;
                 return;
+            } else {
+                emailError.style.display = "none"; // Hide error message if email is valid
             }
 
             const formData = new FormData(e.target);
@@ -169,7 +175,7 @@
                 await addDoc(collection(db, collectionName), data);
 
                 submitButton.textContent = "Thank You, your information has been submitted!";
-                
+        
                 const resetButton = document.createElement("button");
                 resetButton.textContent = "Reset Form";
                 resetButton.style.marginTop = "10px";
@@ -179,7 +185,8 @@
 
             } catch (error) {
                 console.error("Error submitting form: ", error);
-                alert("An error occurred while submitting your form.");
+                emailError.textContent = "An error occurred while submitting your form.";
+                emailError.style.display = "block";
                 submitButton.textContent = "Submit";
                 submitButton.disabled = false;
             }
