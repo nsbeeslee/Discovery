@@ -77,6 +77,13 @@
         input[type="checkbox"] {
             margin-right: 10px;
         }
+        #error-message {
+            color: #ff4d4d; /* Bright red for visibility */
+            font-size: 14px; /* Slightly larger text */
+            font-weight: bold; /* Makes text stand out */
+            margin-top: 5px; /* Adds spacing */
+            display: none; /* Initially hidden */
+        }
     </style>
 </head>
 <body>
@@ -87,7 +94,7 @@
             <input type="text" name="first_name" placeholder="First Name" required>
             <input type="text" name="last_name" placeholder="Last Name" required>
             <input type="email" id="email" name="email" placeholder="Email" required>
-            <span id="emailError" style="color: red; font-size: 12px; display: none;"></span>
+            <span id="error-message">⚠️ Please enter a business email.</span>
             <input type="tel" name="phone" placeholder="Phone (e.g., 555-555-5555)" required>
             <input type="text" name="company" placeholder="Company Name" required>
             <label for="interests" style="color: #fff; margin-bottom: 10px;">I'm interested in (check all that apply):</label>
@@ -141,21 +148,17 @@
 
             const submitButton = document.getElementById("submitButton");
             const emailField = document.getElementById('email');
-            const emailError = document.getElementById('emailError');
-    
+            const emailError = document.getElementById("error-message");
+
             submitButton.textContent = "Submitting...";
             submitButton.disabled = true;
 
             const email = emailField.value;
 
             if (!isValidEmail(email)) {
-                emailError.textContent = "Please enter a business email address.";
-                emailError.style.display = "block";  // Show error message
-                submitButton.textContent = "Submit";
-                submitButton.disabled = false;
-                return;
+                emailError.style.display = "block"; // Show error message
             } else {
-                emailError.style.display = "none"; // Hide error message if email is valid
+                emailError.style.display = "none"; // Hide it when valid
             }
 
             const formData = new FormData(e.target);
