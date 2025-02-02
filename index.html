@@ -81,7 +81,7 @@
 </head>
 <body>
     <div class="form-container">
-        <img src="Verge Nursing.png" alt="Verge Nursing Logo"> <!-- Replace with your logo URL -->
+        <img src="Verge Nursing.png" alt="Verge Nursing Logo"> 
         <h2>Let's Connect</h2>
         <form id="contactForm">
             <input type="text" name="first_name" placeholder="First Name" required>
@@ -103,10 +103,9 @@
             </div>
             <textarea name="message" placeholder="Comments, Questions or Details of Your Request" required></textarea>
             
-            <!-- Hidden input field to distinguish between collections -->
             <input type="hidden" name="form_type" value="Discovery Form">
             
-            <button type="submit">Submit</button>
+            <button type="submit" id="submitButton">Submit</button>
         </form>
     </div>
 
@@ -132,20 +131,24 @@
         // Function to validate email domain
         function isValidEmail(email) {
             const freeEmailDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
-            const emailDomain = email.split('@')[1]; // Extract domain from email
-            return !freeEmailDomains.includes(emailDomain); // Return false if domain is in the list
+            const emailDomain = email.split('@')[1]; 
+            return !freeEmailDomains.includes(emailDomain); 
         }
 
-        // Form Submission
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevent default form submission
+            e.preventDefault(); 
+
+            const submitButton = document.getElementById("submitButton");
+            submitButton.textContent = "Submitting...";
+            submitButton.disabled = true;
 
             const email = document.getElementById('email').value;
 
-            // Check if email is from a free email provider
             if (!isValidEmail(email)) {
-                console.error("Error submitting form: ", error);
-                window.top.location.href = "https://Forms.vergenursing.com/Error.html"; // Redirect to error page
+                alert("Please enter a business email address.");
+                submitButton.textContent = "Submit";
+                submitButton.disabled = false;
+                return;
             }
 
             const formData = new FormData(e.target);
@@ -157,18 +160,28 @@
                 company: formData.get('company'),
                 interests: formData.getAll('interests'),
                 message: formData.get('message'),
-                form_type: formData.get('form_type'), // Identify which collection to store in
+                form_type: formData.get('form_type'), 
                 timestamp: serverTimestamp()
             };
 
             try {
-                // Store data in Firestore under the form_type collection
-                const collectionName = data.form_type; // Use form_type as the collection name
-                const docRef = await addDoc(collection(db, collectionName), data);
-                window.top.location.href = "https://Forms.vergenursing.com/Thankyou.html"; // Redirect after submission
+                const collectionName = data.form_type;
+                await addDoc(collection(db, collectionName), data);
+
+                submitButton.textContent = "Thank You, your information has been submitted!";
+                
+                const resetButton = document.createElement("button");
+                resetButton.textContent = "Reset Form";
+                resetButton.style.marginTop = "10px";
+                resetButton.onclick = () => location.reload();
+
+                document.getElementById('contactForm').appendChild(resetButton);
+
             } catch (error) {
                 console.error("Error submitting form: ", error);
-                window.top.location.href = "https://Forms.vergenursing.com/Error.html"; // Redirect to error page
+                alert("An error occurred while submitting your form.");
+                submitButton.textContent = "Submit";
+                submitButton.disabled = false;
             }
         });
     </script>
