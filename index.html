@@ -145,7 +145,7 @@
             // Check if email is from a free email provider
             if (!isValidEmail(email)) {
                 console.error("Error submitting form: ", error);
-                window.location.href = "https://Forms.vergenursing.com/Error.html"; // Redirect to error page
+                window.top.location.href = "https://Forms.vergenursing.com/Error.html"; // Redirect to error page
             }
 
             const formData = new FormData(e.target);
@@ -165,10 +165,10 @@
                 // Store data in Firestore under the form_type collection
                 const collectionName = data.form_type; // Use form_type as the collection name
                 const docRef = await addDoc(collection(db, collectionName), data);
-                window.location.href = "https://Forms.vergenursing.com/Thankyou.html"; // Redirect after submission
+                window.top.location.href = "https://Forms.vergenursing.com/Thankyou.html"; // Redirect after submission
             } catch (error) {
                 console.error("Error submitting form: ", error);
-                window.location.href = "https://Forms.vergenursing.com/Error.html"; // Redirect to error page
+                window.top.location.href = "https://Forms.vergenursing.com/Error.html"; // Redirect to error page
             }
         });
     </script>
