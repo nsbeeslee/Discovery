@@ -77,33 +77,39 @@
         input[type="checkbox"] {
             margin-right: 10px;
         }
+        #error-message {
+            color: #ff4d4d; /* Bright red for visibility */
+            font-size: 14px; /* Slightly larger text */
+            font-weight: bold; /* Makes text stand out */
+            margin-top: 5px; /* Adds spacing */
+            display: none; /* Initially hidden */
+        }
     </style>
 </head>
 <body>
     <div class="form-container">
-        <img src="Verge Nursing.png" alt="Verge Nursing Logo"> <!-- Replace with your logo URL -->
+        <img src="Verge Nursing.png" alt="Verge Nursing Logo"> 
         <h2>Let's Connect</h2>
         <form id="contactForm">
             <input type="text" name="first_name" placeholder="First Name" required>
             <input type="text" name="last_name" placeholder="Last Name" required>
             <input type="email" id="email" name="email" placeholder="Email" required>
+            <span id="error-message">⚠️ Please enter a business email.</span>
             <input type="tel" name="phone" placeholder="Phone (e.g., 555-555-5555)" required>
             <input type="text" name="company" placeholder="Company Name" required>
-            <label for="interests" style="color: #fff; margin-bottom: 10px;">I'm interested in (check all that apply):</label>
-            <textarea name="message" placeholder="Comments, Questions or Details of Your Request" required></textarea>
+            <textarea name="message" placeholder="Comments or Questions"></textarea>
             
-            <!-- Hidden input field to distinguish between collections -->
             <input type="hidden" name="form_type" value="Contact Form">
             
-            <button type="submit">Submit</button>
+            <button type="submit" id="submitButton">Submit</button>
         </form>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js"></script>
+    <!-- Firebase SDK (CDN version) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
-    <script>
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBo0kk3GuLNpkomN8B_4hAdrCEETl3R7QM",
@@ -115,12 +121,36 @@
         };
 
         // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        // Form Submission
+        // Function to validate email domain
+        function isValidEmail(email) {
+            const freeEmailDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
+            const emailDomain = email.split('@')[1]; 
+            return !freeEmailDomains.includes(emailDomain); 
+        }
+
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+            e.preventDefault(); 
+
+            const submitButton = document.getElementById("submitButton");
+            const emailField = document.getElementById('email');
+            const emailError = document.getElementById("error-message");
+
+            submitButton.textContent = "Submitting...";
+            submitButton.disabled = true;
+
+            const email = emailField.value;
+
+            if (!isValidEmail(email)) {
+                emailError.style.display = "block"; // Show error message
+                submitButton.textContent = "Submit";
+                submitButton.disabled = false;
+                return;
+            } else {
+                emailError.style.display = "none"; // Hide it when valid
+            }
 
             const formData = new FormData(e.target);
             const data = {
@@ -130,20 +160,29 @@
                 phone: formData.get('phone'),
                 company: formData.get('company'),
                 message: formData.get('message'),
-                form_type: formData.get('form_type'), // Identify which collection to store in
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                form_type: formData.get('form_type'), 
+                timestamp: serverTimestamp()
             };
 
             try {
-                // Store data in different collections based on the form_type
-                const collectionName = data.form_type; // e.g., form_submissions1 or form_submissions2
-                await db.collection(collectionName).add(data);
-                alert("Form submitted successfully!");
-                window.location.href = "/Thankyou2.html";
+                const collectionName = data.form_type;
+                await addDoc(collection(db, collectionName), data);
+
+                submitButton.textContent = "Thank You, your information has been submitted!";
+        
+                const resetButton = document.createElement("button");
+                resetButton.textContent = "Reset Form";
+                resetButton.style.marginTop = "10px";
+                resetButton.onclick = () => location.reload();
+
+                document.getElementById('contactForm').appendChild(resetButton);
+
             } catch (error) {
                 console.error("Error submitting form: ", error);
-                alert("An error occurred while submitting your form.");
-                window.location.href = "/Error2.html";
+                emailError.textContent = "An error occurred while submitting your form.";
+                emailError.style.display = "block";
+                submitButton.textContent = "Submit";
+                submitButton.disabled = false;
             }
         });
     </script>
