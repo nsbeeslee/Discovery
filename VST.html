@@ -145,13 +145,6 @@
         const emailField = document.getElementById('email');
         const emailError = document.getElementById('error-message');
 
-        const freeEmailDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
-
-        function isValidEmail(email) {
-            const emailDomain = email.split('@')[1];
-            return !freeEmailDomains.includes(emailDomain);
-        }
-
         adcInput.addEventListener('input', () => {
             if (adcInput.value) {
                 additionalFields.classList.remove('hidden');
@@ -160,19 +153,32 @@
             }
         });
 
-        submitBtn.addEventListener('click', async () => {
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
+                    // Function to validate email domain
+        function isValidEmail(email) {
+            const freeEmailDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
+            const emailDomain = email.split('@')[1]; 
+            return !freeEmailDomains.includes(emailDomain); 
+        }
+
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+
+            const submitButton = document.getElementById("submitButton");
+            const emailField = document.getElementById('email');
+            const emailError = document.getElementById("error-message");
+
+            submitButton.textContent = "Submitting...";
+            submitButton.disabled = true;
 
             const email = emailField.value;
 
             if (!isValidEmail(email)) {
-                emailError.style.display = 'block';
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit';
+                emailError.style.display = "block"; // Show error message
+                submitButton.textContent = "Submit";
+                submitButton.disabled = false;
                 return;
             } else {
-                emailError.style.display = 'none';
+                emailError.style.display = "none"; // Hide it when valid
             }
 
             const adc = parseFloat(adcInput.value);
