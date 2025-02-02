@@ -122,118 +122,113 @@
         </div>
     </form>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+   <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+    const firebaseConfig = {
+            apiKey: "AIzaSyBo0kk3GuLNpkomN8B_4hAdrCEETl3R7QM",
+            authDomain: "verge-contact-form.firebaseapp.com",
+            projectId: "verge-contact-form",
+            storageBucket: "verge-contact-form.firebasestorage.app",
+            messagingSenderId: "1006002945326",
+            appId: "1:1006002945326:web:25b6ff27126bbccfae4ebf",
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        const adcInput = document.getElementById('adc');
-        const additionalFields = document.getElementById('additionalFields');
-        const calculatedFields = document.getElementById('calculatedFields');
-        const submitBtn = document.getElementById('submitBtn');
-        const emailField = document.getElementById('email');
-        const emailError = document.getElementById('error-message');
+    const adcInput = document.getElementById('adc');
+    const additionalFields = document.getElementById('additionalFields');
+    const calculatedFields = document.getElementById('calculatedFields');
+    const submitBtn = document.getElementById('submitBtn');
+    const emailField = document.getElementById('email');
+    const emailError = document.getElementById('error-message');
 
-        adcInput.addEventListener('input', () => {
-            if (adcInput.value) {
-                additionalFields.classList.remove('hidden');
-            } else {
-                additionalFields.classList.add('hidden');
-            }
-        });
+    adcInput.addEventListener('input', () => {
+        if (adcInput.value) {
+            additionalFields.classList.remove('hidden');
+        } else {
+            additionalFields.classList.add('hidden');
+        }
+    });
 
-                    // Function to validate email domain
-        function isValidEmail(email) {
-            const freeEmailDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
-            const emailDomain = email.split('@')[1]; 
-            return !freeEmailDomains.includes(emailDomain); 
+    // Function to validate email domain
+    function isValidEmail(email) {
+        const freeEmailDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
+        const emailDomain = email.split('@')[1]; 
+        return !freeEmailDomains.includes(emailDomain); 
+    }
+
+    submitBtn.addEventListener('click', async (e) => {
+        e.preventDefault(); 
+
+        submitBtn.textContent = "Submitting...";
+        submitBtn.disabled = true;
+
+        const email = emailField.value;
+
+        if (!isValidEmail(email)) {
+            emailError.style.display = "block"; // Show error message
+            submitBtn.textContent = "Submit";
+            submitBtn.disabled = false;
+            return;
+        } else {
+            emailError.style.display = "none"; // Hide it when valid
         }
 
-        document.getElementById('contactForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); 
+        const adc = parseFloat(adcInput.value);
+        const avgHourlyRate = parseFloat(document.getElementById('avgHourlyRate').value);
+        const avgFalls = parseFloat(document.getElementById('avgFalls').value);
+        const fallInjuryRate = parseFloat(document.getElementById('fallInjuryRate').value);
+        const patientsPerDay = parseFloat(document.getElementById('patientsPerDay').value);
+        const patientsPerSitter = parseFloat(document.getElementById('patientsPerSitter').value);
 
-            const submitButton = document.getElementById("submitButton");
-            const emailField = document.getElementById('email');
-            const emailError = document.getElementById("error-message");
+        const basicSavings = (8760 * patientsPerDay * avgHourlyRate) - (Math.ceil(patientsPerDay / patientsPerSitter) * avgHourlyRate * 8760);
+        const fallReductionSavings = (((avgFalls * adc) / 1000) * 365 * 14000);
 
-            submitButton.textContent = "Submitting...";
-            submitButton.disabled = true;
+        document.getElementById('basicSavings').value = `$${basicSavings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.getElementById('fallReductionSavings').value = `$${fallReductionSavings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        calculatedFields.classList.remove('hidden');
 
-            const email = emailField.value;
+        const formData = {
+            adc,
+            avgHourlyRate,
+            avgFalls,
+            fallInjuryRate,
+            patientsPerDay,
+            patientsPerSitter,
+            basicSavings,
+            fallReductionSavings,
+            comments: document.getElementById('comments').value,
+            email,
+            phone: document.getElementById('phone').value,
+            name: document.getElementById('name').value,
+            company: document.getElementById('company').value,
+            hiddenField: document.getElementById('hiddenField').value,
+            timestamp: serverTimestamp()
+        };
 
-            if (!isValidEmail(email)) {
-                emailError.style.display = "block"; // Show error message
-                submitButton.textContent = "Submit";
-                submitButton.disabled = false;
-                return;
-            } else {
-                emailError.style.display = "none"; // Hide it when valid
-            }
+        try {
+            await addDoc(collection(db, 'form_data'), formData);
 
-            const adc = parseFloat(adcInput.value);
-            const avgHourlyRate = parseFloat(document.getElementById('avgHourlyRate').value);
-            const avgFalls = parseFloat(document.getElementById('avgFalls').value);
-            const fallInjuryRate = parseFloat(document.getElementById('fallInjuryRate').value);
-            const patientsPerDay = parseFloat(document.getElementById('patientsPerDay').value);
-            const patientsPerSitter = parseFloat(document.getElementById('patientsPerSitter').value);
-
-            const basicSavings = (8760 * patientsPerDay * avgHourlyRate) - (Math.ceil(patientsPerDay / patientsPerSitter) * avgHourlyRate * 8760);
-            const fallReductionSavings = (((avgFalls * adc) / 1000) * 365 * 14000);
-
-            document.getElementById('basicSavings').value = `$${basicSavings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('fallReductionSavings').value = `$${fallReductionSavings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            calculatedFields.classList.remove('hidden');
-
-            const formData = {
-                adc,
-                avgHourlyRate,
-                avgFalls,
-                fallInjuryRate,
-                patientsPerDay,
-                patientsPerSitter,
-                basicSavings,
-                fallReductionSavings,
-                comments: document.getElementById('comments').value,
-                email,
-                phone: document.getElementById('phone').value,
-                name: document.getElementById('name').value,
-                company: document.getElementById('company').value,
-                hiddenField: document.getElementById('hiddenField').value,
-                timestamp: serverTimestamp()
-            };
-
-try {
-                const collectionName = data.form_type;
-                await addDoc(collection(db, collectionName), data);
-
-                submitButton.textContent = "Thank You, your information has been submitted!";
+            submitBtn.textContent = "Thank You, your information has been submitted!";
         
-                const resetButton = document.createElement("button");
-                resetButton.textContent = "Reset Form";
-                resetButton.style.marginTop = "10px";
-                resetButton.onclick = () => location.reload();
+            const resetButton = document.createElement("button");
+            resetButton.textContent = "Reset Form";
+            resetButton.style.marginTop = "10px";
+            resetButton.onclick = () => location.reload();
 
-                document.getElementById('roiForm').appendChild(resetButton);
+            document.getElementById('roiForm').appendChild(resetButton);
 
-            } catch (error) {
-                console.error("Error submitting form: ", error);
-                emailError.textContent = "An error occurred while submitting your form.";
-                emailError.style.display = "block";
-                submitButton.textContent = "Submit";
-                submitButton.disabled = false;
-            }
-        });
-    </script>
+        } catch (error) {
+            console.error("Error submitting form: ", error);
+            emailError.textContent = "An error occurred while submitting your form.";
+            emailError.style.display = "block";
+            submitBtn.textContent = "Submit";
+            submitBtn.disabled = false;
+        }
+    });
+</script>
 </body>
 </html>
