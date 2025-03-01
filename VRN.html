@@ -222,14 +222,14 @@
                 emailError.style.display = "none"; // Hide it when valid
             } 
             
-            const annualAdmissions = parseFloat(annualAdmissions.value);
+            const annualAdmission = parseFloat(annualAdmissions.value);
             const avgAdmTime = parseFloat(document.getElementById('avgAdmTime').value);
             const annualDischarges = parseFloat(document.getElementById('annualDischarges').value);
             const avgDCtime = parseFloat(document.getElementById('avgDCtime').value);
             const avgRNPay = parseFloat(document.getElementById('avgRNPay').value);
             const vrnMultiple = parseFloat(document.getElementById('vrnMultiple').value);
 
-            const bedsideHoursSaved = ((annualAdmissions * avgAdmTime) + (annualDischarges * avgDCtime)) / 60;
+            const bedsideHoursSaved = ((annualAdmission * avgAdmTime) + (annualDischarges * avgDCtime)) / 60;
             const eliminatedHours = bedsideHoursSaved * vrnMultiple;
             const savings = avgRNPay * eliminatedHours;
 
@@ -239,7 +239,7 @@
             document.getElementById('calculatedFields').classList.remove('hidden');
              
             const formData = {
-                annualAdmissions,
+                annualAdmission,
                 avgAdmTime,
                 annualDischarges,
                 avgDCtime,
