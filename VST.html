@@ -51,7 +51,11 @@
             width: 100%;
         }
 
-        h1, h2, h3 {
+        h1 {
+            color: #191970;
+        }
+        
+        h2, h3 {
             color: #ffdd00;
         }
 
@@ -258,7 +262,7 @@
         try {
             await addDoc(collection(db, 'form_data'), formData);
 
-            submitBtn.textContent = "Thank You, your information has been submitted!";
+            submitBtn.textContent = "Thank You, your information has been submitted! (Scroll Down for Est. Savings)";
         
             const resetButton = document.createElement("button");
             resetButton.textContent = "Reset Form";
