@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Nursing ROI Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        form {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #002b7f;
+            border-radius: 10px;
+        }
+
+        input, textarea, button {
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            width: 45%;
+            text-align: left;
+        }
+
+        .input-group input, .input-group textarea {
+            width: 45%;
+            display: inline-block;
+        }
+
+        button {
+            background-color: #ff4500;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        h1, h2, h3 {
+            color: #ffdd00;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ffdd00;
+        }
+
+        .savings {
+            font-weight: bold;
+            font-size: 1.4em;
+            color: #191970;
+        }
+
+        #error-message {
+            color: #ff4d4d;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <form id="roiForm">
+       <h1>Virtual Nursing ROI Calculator</h1>
+        <div class="section">
+            <h2>Calculate Virtual Nursing ROI</h2>
+            <div class="input-group">
+                <label for="annualAdmissions">Annual Admissions:</label>
+                <input type="number" id="annualAdmissions" placeholder="Adm/Yr" required>
+            </div>
+            
+            <div id="additionalFields" class="hidden">
+                <div class="input-group">
+                    <label for="avgAdmTime">Avg Time to Complete Adm (mins):</label>
+                    <input type="number" id="avgAdmTime" value="45">
+                </div>
+                <div class="input-group">
+                    <label for="annualDischarges">Annual Discharges:</label>
+                    <input type="number" id="annualDischarges" placeholder="DC/Yr">
+                </div>
+                <div class="input-group">
+                    <label for="avgDCtime">Avg Time to Complete Discharge (mins):</label>
+                    <input type="number" id="avgDCtime" value="45">
+                </div>
+                <div class="input-group">
+                    <label for="avgRNPay">Avg RN Pay / Hour:</label>
+                    <input type="number" id="avgRNPay" value="30">
+                </div>
+                <div class="input-group">
+                    <label for="vrnMultiple">VRN Reduction Multiple (0.1-1):</label>
+                    <input type="number" id="vrnMultiple" value="0.5" step="0.1">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Discuss ROI Further?</h2>
+            <p>Let Verge Nursing discuss the ROI calculations in detail with you! Below fields are optional. Estimated ROI savings will display BELOW after submission.</p>
+
+            <div class="input-group">
+                <label for="company">Company:</label>
+                <input type="text" id="company" name="company">
+            </div>
+
+            <div class="input-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" placeholder="First Last">
+            </div>
+            
+            <div class="input-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="example@example.com">
+                <span id="error-message">⚠️ Please enter a business email.</span>
+            </div>
+                
+            <div class="input-group">
+                <label for="phone">Phone:</label>
+                <input type="tel" id="phone" name="phone" placeholder="(123) 456-7890">
+            </div>
+
+            <div class="input-group">
+                <label for="comments">Comments, questions, or details:</label>
+                <textarea id="comments" name="comments" rows="3"></textarea>
+            </div>
+
+            <input type="hidden" id="hiddenField" name="hiddenField" value="VRN Savings">
+
+            <button type="button" id="submitBtn">Submit</button>
+        </div>
+
+        <div id="calculatedFields" class="hidden section">
+            <h3>Estimated Savings</h3>
+            <div class="input-group">
+                <label>Estimated Annual Bedside Hours Saved:</label>
+                <input type="text" id="bedsideHoursSaved" readonly>
+            </div>
+            <div class="input-group">
+                <label>Estimated Annual Eliminated Hours:</label>
+                <input type="text" id="eliminatedHours" readonly>
+            </div>
+            <div class="input-group">
+                <label>Estimated Savings from Eliminated Hours:</label>
+                <input type="text" id="savings" readonly>
+            </div>
+        </div>
+    </form>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBo0kk3GuLNpkomN8B_4hAdrCEETl3R7QM",
+            authDomain: "verge-contact-form.firebaseapp.com",
+            projectId: "verge-contact-form",
+            storageBucket: "verge-contact-form.firebasestorage.app",
+            messagingSenderId: "1006002945326",
+            appId: "1:1006002945326:web:25b6ff27126bbccfae4ebf"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const annualAdmissions = document.getElementById('annualAdmissions');
+        const additionalFields = document.getElementById('additionalFields');
+        const calculatedFields = document.getElementById('calculatedFields');
+        const submitBtn = document.getElementById('submitBtn');
+        const emailField = document.getElementById('email');
+        const emailError = document.getElementById('error-message');   
+
+        
+        annualAdmissions.addEventListener('input', () => {
+            if (annualAdmissions.value) {
+                additionalFields.classList.remove('hidden');
+            } else {
+                additionalFields.classList.add('hidden');
+            }
+        });
+       
+        // Function to validate email domain
+        function isValidEmail(email) {
+            const freeEmailDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
+            const emailDomain = email.split('@')[1]; 
+            return !freeEmailDomains.includes(emailDomain); 
+        }
+
+        submitBtn.addEventListener('click', async (e) => {
+            e.preventDefault(); 
+
+            submitBtn.textContent = "Submitting...";
+            submitBtn.disabled = true;
+
+            const email = emailField.value;
+
+            if (!isValidEmail(email)) {
+                emailError.style.display = "block"; // Show error message
+                submitBtn.textContent = "Submit";
+                submitBtn.disabled = false;
+                return;
+            } else {
+                emailError.style.display = "none"; // Hide it when valid
+            } 
+            
+            const annualAdmissions = parseFloat(annualAdmissions.value);
+            const avgAdmTime = parseFloat(document.getElementById('avgAdmTime').value);
+            const annualDischarges = parseFloat(document.getElementById('annualDischarges').value);
+            const avgDCtime = parseFloat(document.getElementById('avgDCtime').value);
+            const avgRNPay = parseFloat(document.getElementById('avgRNPay').value);
+            const vrnMultiple = parseFloat(document.getElementById('vrnMultiple').value);
+
+            const bedsideHoursSaved = ((annualAdmissions * avgAdmTime) + (annualDischarges * avgDCtime)) / 60;
+            const eliminatedHours = bedsideHoursSaved * vrnMultiple;
+            const savings = avgRNPay * eliminatedHours;
+
+            document.getElementById('bedsideHoursSaved').value = bedsideHoursSaved.toLocaleString();
+            document.getElementById('eliminatedHours').value = eliminatedHours.toLocaleString();
+            document.getElementById('savings').value = `$${savings.toLocaleString()}`;
+            document.getElementById('calculatedFields').classList.remove('hidden');
+             
+            const formData = {
+                annualAdmissions,
+                avgAdmTime,
+                annualDischarges,
+                avgDCtime,
+                avgRNPay,
+                vrnMultiple,
+                bedsideHoursSaved,
+                eliminatedHours,
+                savings,
+                company: document.getElementById('company').value,             
+                name: document.getElementById('name').value,  
+                phone: document.getElementById('phone').value,            
+                email,
+                comments: document.getElementById('comments').value,
+                hiddenField: document.getElementById('hiddenField').value,
+                timestamp: serverTimestamp()
+            };
+
+            try {
+            await addDoc(collection(db, 'form_data'), formData);
+
+            submitBtn.textContent = "Thank You, your information has been submitted! (Scroll Down for Est. Savings)";
+        
+            const resetButton = document.createElement("button");
+            resetButton.textContent = "Reset Form";
+            resetButton.style.marginTop = "10px";
+            resetButton.onclick = () => location.reload();
+
+            document.getElementById('roiForm').appendChild(resetButton);
+
+        } catch (error) {
+            console.error("Error submitting form: ", error);
+            emailError.textContent = "An error occurred while submitting your form.";
+            emailError.style.display = "block";
+            submitBtn.textContent = "Submit";
+            submitBtn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>
